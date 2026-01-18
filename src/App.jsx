@@ -1,13 +1,25 @@
 import { useState } from 'react'
 import { SearchBar } from './components/SearchBar'
+import { WeatherCard } from './components/WeatherCard.jsx'
 import './App.css'
+import { LoadingPage } from './components/LoadingPage.jsx'
+import { ErrorPage } from './components/ErrorPage.jsx'
+import { useWeather } from './hooks/useWeather.js'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const {
+    locations,
+    loading, 
+    error,
+    searchCity
+  } = useWeather();
+ 
 
   return (
     <>
-      <SearchBar/>
+      <SearchBar onSearch={searchCity}/>
+      {loading && <LoadingPage/>}
+      {error && <ErrorPage errorMessage={error}/>}
     </>
   )
 }
