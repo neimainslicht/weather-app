@@ -3,7 +3,7 @@ const BASE_URL = "http://api.openweathermap.org/geo/1.0/direct";
 
 export async function fetchCityList(city) {
   const response = await fetch(
-    `${BASE_URL}?q=${city}&appid=${API_KEY}`
+    `${BASE_URL}?q=${city}&limit=5&appid=${API_KEY}`
   );
 
   if (!response.ok) {
@@ -17,7 +17,7 @@ export async function fetchCityList(city) {
   console.log(data);
 
   return data.map((city) => ({
-    id: '${city.lat}-${city.lon}',
+    id: crypto.randomUUID(),
     name: city.name,
     lat: city.lat,
     lon: city.lon,

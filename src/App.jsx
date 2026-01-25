@@ -5,13 +5,16 @@ import './App.css'
 import { LoadingPage } from './components/LoadingPage.jsx'
 import { ErrorPage } from './components/ErrorPage.jsx'
 import { useWeather } from './hooks/useWeather.js'
+import { CityList } from './components/CityList.jsx'
 
 function App() {
   const {
     locations,
-    loading, 
+    loading,
     error,
-    searchCity
+    weather,
+    searchCity,
+    searchWeather
   } = useWeather();
  
 
@@ -20,6 +23,9 @@ function App() {
       <SearchBar onSearch={searchCity}/>
       {loading && <LoadingPage/>}
       {error && <ErrorPage errorMessage={error}/>}
+      {locations && <CityList cities={locations} onSearch={searchWeather}/>}
+      {weather && <WeatherCard weatherStats={weather}/>}
+      
     </>
   )
 }

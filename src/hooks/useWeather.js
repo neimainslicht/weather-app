@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { fetchCityList } from '../services/geoCodingApi';
+import { fetchWeather } from '../services/weatherApi';
 
 export function useWeather(){
     const [locations, setLocations] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [weather, setWeather] = useState(null);
 
     async function searchCity(query) {
+        setWeather(null);
         setLoading(true);
         setError(null);
 
@@ -21,10 +24,28 @@ export function useWeather(){
         }
         
     }
+
+    async function searchWeather(lat, lon){
+        setLoading(true);
+        setError(null);
+        try {
+            const results = await fetchWeather(lat, lon);
+            setWeather(results);
+        } catch (error) {
+            setError(error.message);
+            setWeather(null); 
+        }
+        finally {
+            setLocations([]);
+            setLoading(false);
+        }
+    }
     return {
         locations,
         loading,
         error,
-        searchCity
+        weather,
+        searchCity,
+        searchWeather
     }
 }

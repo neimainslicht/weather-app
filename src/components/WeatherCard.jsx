@@ -1,13 +1,13 @@
 import { useState } from "react";
 
-export function WeatherCard(){
+export function WeatherCard({ weatherStats }){
     return(
         <div className="card">
             <div className="card-body">
-                <h2 className="card-title">City + Country</h2>
-                <p className="card-content">Current Temperature</p>
-                <p className="card-content">Weather condition (e.g., Clear, Clouds)</p>
-                <img src="src\icons\weather-icon.jpg" alt="weather-icon"/>
+                <h2 className="card-title">{weatherStats.city}, {weatherStats.country}</h2>
+                <p className="card-content">{weatherStats.temp} F</p>
+                <p className="card-content">{weatherStats.condition}</p>
+                <img src={`https://openweathermap.org/img/wn/${weatherStats.icon}.png`} alt="weather-icon"/>
             </div>
 
         </div>
