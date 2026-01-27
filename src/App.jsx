@@ -6,6 +6,8 @@ import { LoadingPage } from './components/LoadingPage.jsx'
 import { ErrorPage } from './components/ErrorPage.jsx'
 import { useWeather } from './hooks/useWeather.js'
 import { CityList } from './components/CityList.jsx'
+import '.\\SpriteAnimation.css'
+
 
 function App() {
   const {
@@ -20,11 +22,14 @@ function App() {
 
   return (
     <>
-      <SearchBar onSearch={searchCity}/>
-      {loading && <LoadingPage/>}
-      {error && <ErrorPage errorMessage={error}/>}
-      {locations && <CityList cities={locations} onSearch={searchWeather}/>}
-      {weather && <WeatherCard weatherStats={weather}/>}
+      <div className="sprite-character">
+        <SearchBar onSearch={searchCity}/>
+        {loading && <LoadingPage/>}
+        {error && <ErrorPage errorMessage={error}/>}
+        {locations && <CityList cities={locations} onSearch={searchWeather}/>}
+        {weather && <WeatherCard weatherStats={weather}/>}
+      </div>
+      
       
     </>
   )

@@ -5,6 +5,11 @@
   text-align: center;
 }
 
+.medium-image {
+  width: 125px; /* or a percentage, like 100% of the parent */
+  height: auto; /* maintains aspect ratio */
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
