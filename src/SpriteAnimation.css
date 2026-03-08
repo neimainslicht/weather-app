@@ -1,12 +1,13 @@
 body {
     background-image: linear-gradient(blue, #ADD8E6);
+ 
 }
-.sprite-character {
+.snow {
     width: 512px;
     height: 512px;
     background-image: url(..\public\sprites\snow-sprite1.png);
-    background-repeat: no-repeat;
-    animation: play 2s steps(10) infinite;
+    background-repeat:repeat;
+    animation: play 3s steps(10) infinite;
 
 }
 

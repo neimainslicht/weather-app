@@ -7,6 +7,8 @@ export function useWeather(){
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [weather, setWeather] = useState(null);
+    const [condition, setCondition] = useState(null);
+
 
     async function searchCity(query) {
         setWeather(null);
@@ -31,6 +33,7 @@ export function useWeather(){
         try {
             const results = await fetchWeather(lat, lon);
             setWeather(results);
+            setCondition(results.condition.replace(/\s+/g, ''));
         } catch (error) {
             setError(error.message);
             setWeather(null); 
@@ -45,6 +48,7 @@ export function useWeather(){
         loading,
         error,
         weather,
+        condition,
         searchCity,
         searchWeather
     }
