@@ -37,6 +37,7 @@ export function useWeather(){
         } catch (error) {
             setError(error.message);
             setWeather(null); 
+            setCondition(null);
         }
         finally {
             setLocations([]);
