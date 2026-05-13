@@ -27,11 +27,11 @@ export function useWeather(){
         
     }
 
-    async function searchWeather(lat, lon){
+    async function searchWeather(lat, lon, city){
         setLoading(true);
         setError(null);
         try {
-            const results = await fetchWeather(lat, lon);
+            const results = await fetchWeather(lat, lon, city);
             setWeather(results);
             setCondition(results.condition.replace(/\s+/g, ''));
         } catch (error) {

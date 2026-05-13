@@ -66,15 +66,14 @@ describe('useWeather', () => {
   });
 
   it('searchCity: clears previous weather before fetching', async () => {
-    // Arrange: prime weather state first via a successful searchWeather call
     fetchWeather.mockImplementation(resolves(MOCK_WEATHER));
     fetchCityList.mockImplementation(resolves(MOCK_CITIES));
     const { result } = renderHook(() => useWeather());
 
-    await act(() => result.current.searchWeather(51.5, -0.12));
+    await act(() => result.current.searchWeather(51.5, -0.12, 'London'));
     expect(result.current.weather).toEqual(MOCK_WEATHER);
 
-    // Act: now search a city — weather should be wiped immediately
+    // weather should be wiped synchronously, before the API resolves
     act(() => { result.current.searchCity('London'); });
     expect(result.current.weather).toBeNull();
 
@@ -88,11 +87,9 @@ describe('useWeather', () => {
 
     const { result } = renderHook(() => useWeather());
 
-    // First call — fails
     await act(() => result.current.searchCity('London'));
     expect(result.current.error).toBe('Network error');
 
-    // Second call — succeeds; error must be cleared
     await act(() => result.current.searchCity('London'));
     expect(result.current.error).toBeNull();
   });
@@ -117,18 +114,27 @@ describe('useWeather', () => {
     fetchWeather.mockImplementation(resolves(MOCK_WEATHER));
     const { result } = renderHook(() => useWeather());
 
-    await act(() => result.current.searchWeather(51.5, -0.12));
+    await act(() => result.current.searchWeather(51.5, -0.12, 'London'));
 
     expect(result.current.weather).toEqual(MOCK_WEATHER);
     expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
   });
 
+  it('searchWeather: passes all three arguments to fetchWeather', async () => {
+    fetchWeather.mockImplementation(resolves(MOCK_WEATHER));
+    const { result } = renderHook(() => useWeather());
+
+    await act(() => result.current.searchWeather(51.5, -0.12, 'London'));
+
+    expect(fetchWeather).toHaveBeenCalledWith(51.5, -0.12, 'London');
+  });
+
   it('searchWeather: strips whitespace from condition', async () => {
     fetchWeather.mockImplementation(resolves({ ...MOCK_WEATHER, condition: 'Partly Cloudy' }));
     const { result } = renderHook(() => useWeather());
 
-    await act(() => result.current.searchWeather(51.5, -0.12));
+    await act(() => result.current.searchWeather(51.5, -0.12, 'London'));
 
     expect(result.current.condition).toBe('PartlyCloudy');
   });
@@ -137,7 +143,7 @@ describe('useWeather', () => {
     fetchWeather.mockImplementation(resolves({ ...MOCK_WEATHER, condition: 'Heavy  Rain  Storm' }));
     const { result } = renderHook(() => useWeather());
 
-    await act(() => result.current.searchWeather(51.5, -0.12));
+    await act(() => result.current.searchWeather(51.5, -0.12, 'London'));
 
     expect(result.current.condition).toBe('HeavyRainStorm');
   });
@@ -147,26 +153,41 @@ describe('useWeather', () => {
     fetchWeather.mockImplementation(resolves(MOCK_WEATHER));
     const { result } = renderHook(() => useWeather());
 
-    // Populate locations first
     await act(() => result.current.searchCity('London'));
     expect(result.current.locations).toEqual(MOCK_CITIES);
 
-    // Fetching weather must clear them (in finally block)
-    await act(() => result.current.searchWeather(51.5, -0.12));
+    // finally block clears locations regardless of outcome
+    await act(() => result.current.searchWeather(51.5, -0.12, 'London'));
     expect(result.current.locations).toEqual([]);
   });
 
   // ── searchWeather — error path ─────────────────────────────────────────────
 
-  it('searchWeather: sets error and nulls weather on failure', async () => {
+  it('searchWeather: sets error and nulls weather and condition on failure', async () => {
     fetchWeather.mockImplementation(rejects('Timeout'));
     const { result } = renderHook(() => useWeather());
 
-    await act(() => result.current.searchWeather(999, 999));
+    await act(() => result.current.searchWeather(999, 999, 'Nowhere'));
 
     expect(result.current.error).toBe('Timeout');
     expect(result.current.weather).toBeNull();
+    expect(result.current.condition).toBeNull();
     expect(result.current.loading).toBe(false);
+  });
+
+  it('searchWeather: nulls a stale condition when a subsequent fetch fails', async () => {
+    fetchWeather
+      .mockImplementationOnce(resolves(MOCK_WEATHER))
+      .mockImplementationOnce(rejects('Timeout'));
+    const { result } = renderHook(() => useWeather());
+
+    // First call succeeds — condition is set
+    await act(() => result.current.searchWeather(51.5, -0.12, 'London'));
+    expect(result.current.condition).toBe('PartlyCloudy');
+
+    // Second call fails — condition must be cleared
+    await act(() => result.current.searchWeather(999, 999, 'Nowhere'));
+    expect(result.current.condition).toBeNull();
   });
 
   it('searchWeather: still clears locations even when fetch fails', async () => {
@@ -175,7 +196,7 @@ describe('useWeather', () => {
     const { result } = renderHook(() => useWeather());
 
     await act(() => result.current.searchCity('London'));
-    await act(() => result.current.searchWeather(999, 999));
+    await act(() => result.current.searchWeather(999, 999, 'Nowhere'));
 
     // finally block runs regardless of error
     expect(result.current.locations).toEqual([]);
@@ -197,7 +218,7 @@ describe('useWeather', () => {
     fetchWeather.mockImplementation(resolves({ ...MOCK_WEATHER, condition: 'Sunny' }));
     const { result } = renderHook(() => useWeather());
 
-    await act(() => result.current.searchWeather(51.5, -0.12));
+    await act(() => result.current.searchWeather(51.5, -0.12, 'London'));
 
     expect(result.current.condition).toBe('Sunny');
   });

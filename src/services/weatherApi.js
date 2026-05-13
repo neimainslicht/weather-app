@@ -1,7 +1,7 @@
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
-export async function fetchWeather(latitude, longitude){
+export async function fetchWeather(latitude, longitude, city){
     const response = await fetch(`${BASE_URL}?lat=${latitude}&lon=${longitude}&units=imperial&appid=${API_KEY}`);
 
     if (!response.ok) {
@@ -15,8 +15,9 @@ export async function fetchWeather(latitude, longitude){
 
     console.log(data);
     return {
-        city: data.name,
-        country: data.sys.country,
+        city: city.name,
+        state: city.state,
+        country: city.country,
         temp: data.main.temp,
         condition: data.weather[0].description,
         icon: data.weather[0].icon
